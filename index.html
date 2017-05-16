@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Weex QR</title>
+    <meta name="viewport" content="width=device-width, nitial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="format-detection" content="telephone=no, email=no">
+    <script src="./assets/config.js"></script>
+    <script src="./assets/qrcode.js"></script>
+</head>
+<body>
+
+<div style="position: absolute; top: 50%;">
+    <div style="position: absolute; top: -150px; margin-top: 0; width: 100vw; text-align: center">
+        <a id="aUrl" href="#" target="_blank">
+            <canvas id="canvas" width="200" height="200"></canvas>
+        </a>
+        <p id="textUrl" class="bundle-url"></p>
+    </div>
+</div>
+
+<script>
+
+    function renderQR(url) {
+        document.getElementById("textUrl").innerHTML = url;
+        document.getElementById("aUrl").href = url;
+        const qrcodedraw = new QRCodeLib.QRCodeDraw();
+        qrcodedraw.draw(document.getElementById('canvas'), url, function () {
+        })
+    }
+
+    const xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+            const version = JSON.parse(xmlhttp.responseText);
+            console.info(version);
+
+//            const url = `http://${CURRENT_IP}:89/dist/app.weex.${version.hash}.js`;
+            const url = `http://${CURRENT_IP}:89/dist/app.weex.js`;
+            renderQR(url);
+        }
+    };
+
+    xmlhttp.open('GET', `http://localhost:89/dist/app.version.json`);
+    xmlhttp.send();
+
+
+</script>
+</body>
+</html>

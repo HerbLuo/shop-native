@@ -1,0 +1,52 @@
+{
+  "name": "shop-native",
+  "description": "shop-native",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "keywords": [
+    "weex",
+    "vue"
+  ],
+  "scripts": {
+    "dev": "webpack --watch",
+    "serve": "node build/init.js -h 192.168.137.1 && serve -p 89",
+    "debug": "weex-devtool -h 192.168.137.1 -p 8089"
+  },
+  "dependencies": {
+    "axios": "^0.15.3",
+    "babel-polyfill": "^6.6.1",
+    "babel-runtime": "^6.6.1",
+    "lodash": "^4.17.4",
+    "lru-cache": "^4.0.2",
+    "vue": "^2.3.3",
+    "vue-resource": "^1.2.1",
+    "vue-router": "^2.1.1",
+    "vuex": "^2.1.1",
+    "vuex-router-sync": "^4.0.1",
+    "weex-vue-render": "^0.11.25"
+  },
+  "devDependencies": {
+    "babel-core": "^6.20.0",
+    "babel-loader": "^6.2.9",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-es2016": "^6.24.1",
+    "babel-preset-es2017": "^6.24.1",
+    "css-loader": "^0.26.1",
+    "file-loader": "^0.10.1",
+    "generate-asset-webpack-plugin": "^0.3.0",
+    "html-webpack-plugin": "^2.28.0",
+    "ip": "^1.1.4",
+    "serve": "^1.4.0",
+    "url-loader": "^0.5.8",
+    "vue-loader": "^10.0.2",
+    "vue-template-compiler": "^2.3.3",
+    "webpack": "^1.14.0",
+    "weex-devtool": "^0.2.64",
+    "weex-loader": "^0.4.1",
+    "weex-vue-loader": "^0.2.5"
+  }
+}

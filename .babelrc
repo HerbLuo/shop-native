@@ -1,0 +1,17 @@
+{
+  "presets": [
+    "es2015"
+  ],
+  "plugins": [
+    "transform-object-rest-spread",
+    "transform-async-to-generator",
+    [
+      "transform-runtime",
+      {
+        "helpers": false,
+        "polyfill": false,
+        "regenerator": true,
+      }
+    ]
+  ]
+}
