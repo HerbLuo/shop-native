@@ -1,3 +1,14 @@
+node_modules
+dist
+config.js
+*log
+
+#################
+## IDEA
+#################
+.idea/
+*.iml
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
