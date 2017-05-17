@@ -134,17 +134,10 @@ export default {
         },
 
         /**
-         * rushBuy 抢购
+         * rushbuy 抢购
          */
         getRushbuy() {
             return `${this.base}/app/native/rushbuy/`
-        },
-
-        /**
-         * 极有家
-         */
-        getJiyoujia(page, apagesize) {
-            return `${this.base}/app/native/jiyoujia/page/${page}/apagesize/${apagesize}/`
         },
 
         // ----------------------USER-----------------------
