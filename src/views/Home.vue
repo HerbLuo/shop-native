@@ -14,8 +14,8 @@
         >
             <refresh class="refresh" @refresh="onRefresh" @pullingdown="onPullingDown" :display="refreshDisplay">
                 <!--<text>onrefresh...</text>-->
-                <!--<refresh-indicator></refresh-indicator>-->
-                <loading-indicator></loading-indicator>
+                <refresh-indicator :canTouchMove="canTouchMove"></refresh-indicator>
+                <!--<loading-indicator></loading-indicator>-->
             </refresh>
 
             <!-- 轮播图 -->
@@ -62,7 +62,7 @@
 
     import log from '../utils/log'
     import loadingState from '../utils/LoadingState'
-    import {ACTION_SET_HOME_REFRESHING} from '../store/mutation-action'
+    import {ACTION_SET_HOME_REFRESHING, ON_HOME_REFRESHING} from '../store/mutation-action'
 
     import SliderBar from "../components/home/SliderBar.vue";
     import TopBar from "../components/home/TopBar.vue";
@@ -71,13 +71,14 @@
     import SplitBar from "../components/home/SplitBar.vue";
     import BlockRushBuy from "../components/home/Block_RushBuy.vue";
     import BlockJiYouJia from "../components/home/Block_JiYouJia.vue";
-
+    import RefreshIndicator from "../components/common/RefreshIndicator.vue";
 
     //noinspection ES6ModulesDependencies
     const modal = weex.requireModule('modal');
 
     export default {
         components: {
+            RefreshIndicator,
             BlockJiYouJia,
             BlockRushBuy,
             SplitBar,
@@ -93,6 +94,7 @@
                 scroller: {
                     height: '0'
                 },
+                canTouchMove: false,
 
                 /* data */
                 loadBlock: [],
@@ -134,10 +136,20 @@
             },
             onRefresh() {
                 console.info('on refreshing');
+                this.$store.commit(ON_HOME_REFRESHING, (callWhenFinished) => {
+                    setTimeout(callWhenFinished, 500);
+                });
                 this.$store.dispatch(ACTION_SET_HOME_REFRESHING);
+
             },
-            onPullingDown() {
-                console.info('on pullingdown')
+            onPullingDown(e) {
+                let abs_p = e.pullingDistance;
+                abs_p < 0 && (abs_p = -abs_p);
+
+                if (this.canTouchMove === false)
+                    abs_p > e.viewHeight && (this.canTouchMove = true);
+                else
+                    abs_p < e.viewHeight && (this.canTouchMove = false);
             },
 
             loadmore() {

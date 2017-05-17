@@ -4,44 +4,52 @@
     change logs:
     2017/4/22 herbluo created
 -->
+<!--suppress JSUnresolvedVariable -->
 <template>
-    <div>
-                <div class="indicator">
-                    <div class="cricle-right"></div>
-                    <div class="block"></div>
-                    <div class="cricle-left"></div>
-                    <div class="block"></div>
-                </div>
+    <div class="rel">
+        <image
+                class="bg-image"
+                src="//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/5d334ce436c657c23542d675af73c1f951d010c1.png"
+        ></image>
+        <div class="refresh-indicator">
+            <text class="text">{{canTouchMove ? '松开刷新' : '下拉刷新'}}</text>
+        </div>
     </div>
 </template>
 
 <style scoped>
-    .cricle-right, .cricle-left {
-        position: absolute;
-        top: 0;
-        left: 0;
-
-        width: 58px;
-        height: 58px;
-        border-radius: 29px;
-        border-width: 2px;
-        border-color: #fff;
-        border-style: solid;
-        /*background-color: #fff;*/
-    }
-    .indicator {
+    .rel {
         position: relative;
-        width: 58px;
-        height: 58px;
-
-        margin-top: 18px;
-        margin-bottom: 12px;
     }
+    .bg-image {
+        width: 750px;
+        height: 1335px;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+    }
+    .refresh-indicator {
+        width: 750px;
+        height: 120px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .text {
+        color: white;
+    }
+
 </style>
 
 <script>
     export default {
-        name: 'refresh-indicator'
+        name: 'refresh-indicator',
+        props: {
+            canTouchMove: {
+                type: Boolean, /* show or hide */
+                'default': false
+            }
+        },
     }
 </script>
 
