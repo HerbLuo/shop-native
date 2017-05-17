@@ -6,9 +6,9 @@
 > 修改了[部分代码](#repair_async)，使得async语法糖在安卓平台下也顺利运行。
 >
 > 特性：
-> 1. 动态加载初始化代码，在app首次打开时，初始化数据持久层数据。
-> 2. 启用了内存缓存和闪存缓存，当缓存数据过旧时，采用服务端数据。
-> 3. app创建时，自动启用loading状态，当所有组件加载完毕后，通知 java，oc 端。
+> 1. 动态加载初始化代码，在app首次打开时，初始化持久层数据。
+> 2. 启用了内存缓存和闪存缓存，当数据过旧时，采用服务端数据。
+> 3. app创建时，自动启用loading状态，当所有组件加载完毕后，转换状态为loaded，通知 java，oc 端。
 
 ## file structure
 
@@ -51,13 +51,13 @@ npm run debug
 
 2. 运行[服务端代码](https://github.com/HerbLuo/shop-api)或者跳过此步
 
-3. 修改 `/src/api/index.js` 下的服务端地址 *(default.)url.base* 为步骤1中的ip
+3. 修改 `/src/api/index.js` 下的服务端地址 *(default.)url.base* 为步骤2中的ip
 <br/> 或 `http://www.cloudself.cn/shop/`
 
 4. 修改 `package.json` 下的 serve script，将ip修改成 本机可用的ip，port 可保持89不变
 <br/> 修改 `/src/api/index.js` 下的app地址 *(default.)app.appBase* 为上述的ip + port
 
-5. <span id="repair_async">打开</span> `\node_modules\regenerator-runtime\runtime.js`, 进行如下修改
+5. <span name="repair_async">打开</span> `\node_modules\regenerator-runtime\runtime.js`, 进行如下修改
 ```
 // 删除如下代码片段 
 var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype);
@@ -85,6 +85,7 @@ GeneratorFunctionPrototype.constructor = GeneratorFunction;
 
 ## other
 [安卓端](https://github.com/HerbLuo/shop-android)
+
 [IOS请使用playground](https://github.com/apache/incubator-weex/tree/0.13-dev/ios)
 
 # License:
