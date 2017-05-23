@@ -210,7 +210,7 @@ Log.prototype = {
     /**
      * Log debug `msg`.
      *
-     * @param  {String} msg
+     * @param  msg
      * @api public
      */
 
