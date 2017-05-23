@@ -116,44 +116,218 @@
 
 <script>
     import SplitBar from "./SplitBar.vue";
+
+    const _ = require('lodash');
+    import api from '../../api/'
+    import dao from "../../dao/";
+    import log from '../../utils/log'
+    import loadingState from '../../utils/LoadingState'
+    import {ON_HOME_REFRESHING} from "../../store/mutation-action";
+    import {errorHandler} from "../../utils/errorStack";
+    import loader from '../../utils/shop-native/loader'
+    import blockHandler, {
+        cache,
+        DataContainer
+    } from '../../utils/shop-native/handler'
+
+
+    const BLOCK_JIYOUJIA = 'block_ji_you_jia';
+
     export default {
         components: {SplitBar},
         name: 'block-ji-you-jia',
+        beforeCreate() {
+            loadingState.loading(BLOCK_JIYOUJIA)
+        },
         data() {
             return {
-                block: {
-                    title: '我淘我家',
-                    head: [{
-                        type: 'left',
-                        img: '//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/d05fc28759bd6cc2b0ca5e113875e6a4352ed524.jpg',
-                        text: '捷森麦片，让早餐更具鲜活力量',
-                    }, {
-                        type: 'right',
-                        img: '//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/77e8826bcacb93d3d20244c57e946683190e5af9.jpg',
-                        text: '#深夜食堂'
-                    }],
-                    content: [[{
-                        img: '//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/922b2bafacacadf77ab23eed3c89d4481ef24af2.png',
-                        index: 1,
-                        link: ''
-                    }, {
-                        img: '//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/2adf6dd2b31c938a314500977adf7694709a3c05.png',
-                        index: 2,
-                        link: ''
-                    }], [{
-                        img: '//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/4afa686615dec3d1d839d92eddbd9058dc473bf8.png',
-                        index: 3,
-                        link: ''
-                    }, {
-                        img: '//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/2d57ce513ecd21fa0d1b13e2dc2b6823531228e0.png',
-                        index: 4,
-                        link: ''
-                    }]]
-                },
+                /*
+                 * ui对应数据，用于渲染
+                 */
+                block: {},
+
+                /*
+                 * 临时数据，包含很多组
+                 * 每个组进过简单处理即为block
+                 */
+                zippedData: [],
+                /*
+                 * 当前已拉取的数据的总长度
+                 */
+                zippedLength: 0,
+                /*
+                 * 当前显示在界面上的是第几组数据
+                 *
+                 * 该数据的初始数据必须不同于 zippedLength
+                 * 原因是这两个数据相等时，数据加载器会禁用掉缓存
+                 */
+                zippedIndex: undefined,
+
+                /*
+                 * 用于api请求的分页
+                 */
+                page: 0,
+                /*
+                 * 分页总页数
+                 */
+                pageLength: undefined,
             }
         },
         created() {
+            this.render();
+            this.registerRefreshEvent();
+        },
+        methods: {
+            /**
+             * 注册刷新事件
+             */
+            registerRefreshEvent() {
+                // 注册刷新事件
+                this.$store.commit(ON_HOME_REFRESHING, (callWhenFinished) => {
+                    log.info(`[${BLOCK_JIYOUJIA}] rush_jiyoujia 刷新中`);
+                    this.refresh(callWhenFinished);
+                })
+            },
+            /**
+             * 刷新
+             */
+            refresh(callWhenFinished) {
 
+                // 服务器返回的数据还没用完
+                if (++this.zippedIndex < this.zippedLength) {
+                    log.info(`[${BLOCK_JIYOUJIA}] 采用了未用完的服务器数据`);
+                    this.__handler(callWhenFinished);
+                    return;
+                }
+
+                // 不是最后一页数据（服务器数据）
+                if (++this.page < this.pageLength) {
+                    log.info(`[${BLOCK_JIYOUJIA}] 服务器返回的数据都已用完，再次拉取数据中`);
+                    this.render(callWhenFinished);
+                    return;
+                }
+
+                // 最后一页数据，ui上的显示数据重复之前的数据即可
+                log.info('服务器资源不足，重置为第一组数据');
+                this.zippedIndex = 0;
+                this.__handler();
+                callWhenFinished();
+
+            },
+            /**
+             * 加载数据
+             */
+            loader() {
+                return new Promise(resolve => {
+                    loader.A({
+                        logKey: `[${BLOCK_JIYOUJIA}]`,
+                        version: this.zippedLength === this.zippedIndex ? 'no-cache' : '*',
+                        cacheName: BLOCK_JIYOUJIA,
+                        storagePromise: dao.get__ji_you_jia_groups(),
+                        serverPromiseFunc: () => Vue.axios.get(api.url.getJiyoujia(this.page, 2)),
+                        renderCallback: (data, type) => resolve({data, type})
+                    })
+                });
+            },
+            /**
+             * 自定义的处理器
+             */
+            __handler(callWhenFinished) {
+                this.handler(this.zippedData, 'storage', callWhenFinished);
+            },
+
+            /**
+             * 创建处理器
+             */
+            __getBlockHandler(callWhenFinished) {
+                /**
+                 * 此时的data已经处理完毕
+                 * 直接与视图绑定
+                 *
+                 * @param uiData
+                 */
+                const uiDataHandler = (uiData) => {
+                    callWhenFinished && callWhenFinished();
+                    this.block = uiData;
+                    loadingState.ok(BLOCK_JIYOUJIA)
+                };
+
+                const handlers = {
+                    error: {
+                        handler: _.curryRight(errorHandler.default)(`[${BLOCK_JIYOUJIA}] 网络链接错误`)
+                    },
+
+                    server: {
+                        handlerSnippet: {
+                            originalData: this.zippedData
+                        },
+                        after: {daoHandler: (data) => dao.set__ji_you_jia_groups(data).then()},
+                    },
+
+                    storage: {
+                        before: {
+                            daoDeleteHandler: (data) => dao.delete__ji_you_jia_groups(data).then(),
+                            daoSetHandler: (data) => dao.set__ji_you_jia_groups(data).then(),
+                        },
+                        handlerSnippet: {
+                            zippedIndex: this.zippedIndex || (this.zippedIndex = 0),
+                            currentData: {
+                                head: this.block.head,
+                                content: this.block.content && _.flatten(this.block.content),
+                            },
+                            i_need_the_zipped_data: d => (this.zippedData = d, this.calcZippedlength(d))
+                        },
+                    },
+
+                    timer: 'storage',
+
+                    cache: {
+                        handlerSnippet: uiDataHandler
+                    }
+                };
+
+                /*
+                 * 将处理器置入处理方法中（第一阶）
+                 */
+                return blockHandler(handlers);
+
+            },
+
+            handler(data, type, callWhenFinished) {
+
+                /*
+                 * 使用处理器处理数据
+                 */
+                DataContainer.of(data)
+                    .map(this.__getBlockHandler(callWhenFinished)(type));
+
+            },
+
+            /**
+             * 处理与渲染数据
+             */
+            async render(callWhenFinished) {
+
+                /*
+                 * 拉取数据
+                 */
+                let event = await this.loader();
+                log.info(`[${BLOCK_JIYOUJIA}] 使用了 ${event.type} 类型的数据`);
+
+                /*
+                 * 计算服务器数据总页数
+                 */
+                this.calcPageLength(event.data);
+
+                this.handler(event.data, event.type, callWhenFinished)
+
+            },
+            calcPageLength(serverData) {
+                this.pageLength = Math.max(serverData.head.totalPages, serverData.content.totalPages);
+            },
+            calcZippedlength(zippedData) {
+                this.zippedLength = Math.min(zippedData.head.length, zippedData.content.length)
+            }
         }
     }
 </script>

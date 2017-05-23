@@ -164,7 +164,7 @@ const store = new Vuex.Store({
          */
         [ACTION_UPDATE_APP_DATA_IN_STORAGE] ({commit, state}, keySet) {
             commit(__UPDATE_APP_DATA_IN_STORAGE, keySet);
-            dao.debounce_set__entrance_bar(state.appDataInStorage);
+            dao.debounce_set__app(state.appDataInStorage);
         }
     }
 });

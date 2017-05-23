@@ -25,9 +25,12 @@
  * 2017/5/5 herbluo created
  */
 
-import cache from '../cache'
+import __cache from '../cache'
 import log from '../log'
 
+/**
+ * 数据拉取方案
+ */
 export default {
 
     /**
@@ -54,7 +57,14 @@ export default {
      * @returns {Promise.<void>}
      * @constructor
      */
-    A: async ({logKey = '[LOADER A]', version, cacheName, storagePromise, serverPromiseFunc, renderCallback}) => {
+    A: async ({
+                  logKey = '[LOADER A]',
+                  version,
+                  cacheName,
+                  storagePromise,
+                  serverPromiseFunc,
+                  renderCallback
+              }) => {
 
         // appEntranceVersion 被意外置空了
         if (version === undefined) {
@@ -67,7 +77,7 @@ export default {
             versionSplited;
         if (
             version !== 'nocache'
-            && (data = cache.get(cacheName)) // 缓存中取到了缓存值
+            && (data = __cache.get(cacheName)) // 缓存中取到了缓存值
             && ( // 且以下任意一条件满足
                 data.version === version // 1. 缓存中的版本可用
                 || version === '*' // 2. 参数version 指定了可以使用 任意版本 的缓存
@@ -81,7 +91,12 @@ export default {
         // 获取闪存中的entrances
         let event = await storagePromise;
         data = event.data;
-        data = data && data !== 'undefined' && JSON.parse(data);
+        try {
+            data = data && data !== 'undefined' && JSON.parse(data);
+        } catch (e) {
+            log.warning('can not parse data: ' + data);
+            data = null;
+        }
 
         // 闪存中的entrances版本可用
         if (data && (data.version === version)) {
@@ -134,4 +149,3 @@ export default {
     },
 
 }
-

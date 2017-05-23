@@ -74,13 +74,13 @@
 <script>
 
     import Timer from "./rushbuy/Timer.vue";
-    import {errorHander} from "../../utils/errorStack";
+    import {errorHandler} from "../../utils/errorStack";
     import {ON_HOME_REFRESHING} from '../../store/mutation-action'
     import log from '../../utils/log'
     import loadingState from '../../utils/LoadingState'
     import cache from '../../utils/cache'
     import arrayUtil from '../../utils/array-util'
-    import shopNativeDataLoader from "../../utils/shop-native/shopNativeDataLoader";
+    import loader from "../../utils/shop-native/loader";
     import dao from "../../dao/index";
     import api from "../../api/index";
 
@@ -120,7 +120,7 @@
                 /*
                  * 总组数
                  */
-                totalDataGroup: -2,
+                totalDataGroup: undefined,
             }
         },
         methods: {
@@ -159,7 +159,7 @@
                 log.info('[block_rush_buy] loading data');
 
                 // 依次从 cache, storage, server获取entrance
-                shopNativeDataLoader.A({
+                loader.A({
                     logKey: `[${BLOCK_RUSHBUY}]`,
                     version: this.currentDataGroupIndex === this.totalDataGroup ? 'no-cache' : '*',
                     cacheName: BLOCK_RUSHBUY,
@@ -184,12 +184,12 @@
                 let dataFromServer, // 原始数据 服务端返回的数据
                     rushBuyGroups, // 按照index分组后的数据（服务端返回了多组数据）
                     rushBuys, // 单组数据
-                    rushBuyInUi; //用于Ui绑定的数据
+                    rushBuyInUi; // 用于Ui绑定的数据
 
                 //noinspection FallThroughInSwitchStatementJS
                 switch (type) {
                     case 'error':
-                        errorHander.default(data, `[${BLOCK_RUSHBUY}] 网络链接错误`);
+                        errorHandler.default(data, `[${BLOCK_RUSHBUY}] 网络链接错误`);
                         break;
 
                     case 'server':
@@ -208,9 +208,7 @@
                         }
 
                         // 为数据加入时间戳信息
-                        data.forEach(rushbuy => {
-                            rushbuy.timestamp = new Date().getTime();
-                        });
+                        data.forEach(rushbuy => rushbuy.timestamp = new Date().getTime());
 
                         // 分组 或者合并原有组且分组
                         rushBuyGroups = arrayUtil.groupBy_PropertyEqual(dataFromServer, 'index', this.rushBuyGroups);
@@ -268,8 +266,6 @@
                     rushBuyInUi && rushBuys.forEach((rushBuy, i) => {
                         rushBuy.placeholder = rushBuyInUi[(i/2)|0][i%2].img;
                     });
-
-                    console.info(rushBuys);
 
                     // 为视图指定专用的数据格式
                     return [rushBuys.slice(0, 2), rushBuys.slice(2, 4)];

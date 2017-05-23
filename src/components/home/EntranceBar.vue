@@ -58,7 +58,7 @@
     import cache from '../../utils/cache'
     import dao from '../../dao'
     import {ACTION_UPDATE_APP_DATA_IN_STORAGE} from '../../store/mutation-action'
-    import shopNativeDataLoader from '../../utils/shop-native/shopNativeDataLoader'
+    import shopNativeDataLoader from '../../utils/shop-native/loader'
 
 
     //noinspection ES6ModulesDependencies

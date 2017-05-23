@@ -41,11 +41,20 @@ const dao = {
     },
 
     /**
+     * 极有家
+     */
+    get__ji_you_jia_groups() {
+    },
+    set__ji_you_jia_groups() {
+    },
+    delete__ji_you_jia_groups() {},
+
+    /**
      * 保存 entrance bar
      * 去除抖动
      * 三秒内的多次请求仅保留最后一次请求
      */
-    debounce_set__entrance_bar() {
+    debounce_set__app() {
     },
 
 };

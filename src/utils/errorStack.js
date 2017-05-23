@@ -14,7 +14,7 @@ export default error;
 
 import log from './log'
 
-export const errorHander = {
+export const errorHandler = {
     /**
      * 默认的错误处理方案
      */
