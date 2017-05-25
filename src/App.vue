@@ -1,23 +1,17 @@
+<!--
+    App
+    此模块加载时，界面不会有任何显示
+    在App的loading状态转换成loaded之后，
+    App很快完成渲染，此时可以通知native端
+ -->
 <template>
     <div class="app">
         <router-view></router-view>
-        <tab-bar class="par-tabbar"></tab-bar>
     </div>
 </template>
 <style scoped>
-    .par-tabbar {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-    }
 </style>
 <script>
-
-    /*
-     * vue文件
-     */
-    import Home from './views/Home.vue';
-    import TabBar from './components/common/Tabbar.vue';
 
     /*
      * weex模块
@@ -49,10 +43,6 @@
     } from './store/mutation-action'
 
     export default {
-        components: {
-            Home,
-            TabBar,
-        },
         name: 'app',
         store,
         /**
@@ -106,6 +96,7 @@
 
                 // 初始化
                 eval(response.data);
+
             } else {
                 success();
             }
@@ -113,7 +104,7 @@
             // 初始化模块执行成功
             function success() {
                 log.info('[app] App 初始化成功');
-                vm.$router.push('home');
+                vm.$router.push({name: 'homeHome'});
                 vm.init();
             }
 

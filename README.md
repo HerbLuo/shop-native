@@ -3,7 +3,7 @@
 >
 > 基于 weex(vuejs)的shop-native  
 > 同时使用了vuex, vue-router, axios(少许修改)。  
-> 修改了[部分代码](#repair_async)，使得async语法糖在安卓平台下也顺利运行。
+> 修改了[部分代码 # run it 5](#repair_async)，使得async语法糖在安卓平台下也顺利运行。
 >
 > 特性：
 > 1. 动态加载初始化代码，在app首次打开时，初始化持久层数据。
