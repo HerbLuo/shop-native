@@ -44,7 +44,7 @@ export default {
             component: HomeUser,
         }]
     }, {
-        path: '/item/',
+        path: '/item/:id/version/:version/details/',
         name: 'item',
         component: Item,
     }]
