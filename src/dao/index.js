@@ -57,6 +57,13 @@ const dao = {
     debounce_set__app() {
     },
 
+    /**
+     * 根据id保存或查找商品
+     * 参数是先id，再数据
+     */
+    get_by__item__by_id() {},
+    set_by__item__by_id() {},
+
 };
 
 /*
@@ -175,7 +182,18 @@ chain = {
                 storage_promise.setItem(bean.value, bean.data)
             }, 3000, {leading: false, trailing: true})
             : undefined;
+    },
+
+    operateByStorage(bean) {
+        const allowMethod = ['get_by', 'set_by', 'remove_by'];
+        return arrayUtil.includes(allowMethod, bean.method)
+            ? storage_promise[bean.method.split('_')[0] + 'Item'](
+                bean.value + '_' + bean.config[2].split('_')[1] + '_' + bean.args[0],
+                bean.args[1]
+            )
+            : undefined;
     }
+
 };
 
 main();

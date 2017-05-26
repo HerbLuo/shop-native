@@ -5,7 +5,7 @@
     2017/3/14 herbluo created
 -->
 <template>
-    <!--<div>-->
+    <div>
         <div class="tabbar" ref="tabbar">
             <!--suppress CommaExpressionJS -->
             <div class="tab" v-for="(tab, index) in tabs" @click="tabClick(index)">
@@ -15,25 +15,35 @@
                 ></image>
             </div>
         </div>
-    <!--</div>-->
+    </div>
+
 </template>
 
 <style scoped>
     .tabbar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+
         width: 750px;
         height: 108px;
+
+        flex-direction: row;
+        align-items: center;
+
         border-top-width: 1px;
         border-color: #CCC;
         border-style: solid;
-        flex-direction: row;
-        padding-top: 10px;
-        padding-bottom: 10px;
+
         background-color: #FFF;
     }
 
     .tab {
+        height: 108px;
         flex: 1;
+
         align-items: center;
+        justify-content: center;
     }
 
     .img {
@@ -57,31 +67,31 @@
                 imgbase: 'http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v1/imgs/',
                 tabs: [{
                     name: '首页',
-                    routerName: 'home',
+                    routerName: 'homeHome',
                     img: 'tabbar-home.png',
                     imgActived: 'tabbar-home-a.png',
                     isActived: true,
                 }, {
                     name: '微淘',
-                    routerName: 'talk',
+                    routerName: 'homeTalk',
                     img: 'tabbar-talk.png',
                     imgActived: 'tabbar-talk-a.png',
                     isActived: false,
                 }, {
                     name: '问大家',
-                    routerName: 'qa',
+                    routerName: 'homeQa',
                     img: 'tabbar-qa.png',
                     imgActived: 'tabbar-qa-a.png',
                     isAcvited: false,
                 }, {
                     name: '购物车',
-                    routerName: 'car',
+                    routerName: 'homeCar',
                     img: 'tabbar-car.png',
                     imgActived: 'tabbar-car-a.png',
                     isActived: false,
                 }, {
                     name: '我的淘宝',
-                    routerName: 'user',
+                    routerName: 'homeUser',
                     img: 'tabbar-user.png',
                     imgActived: 'tabbar-user-a.png',
                     isActived: false,
@@ -135,7 +145,9 @@
                 });
 
                 // 路由导航
-                vm.$router.push(vm.tabs[index].routerName);
+                vm.$router.push({
+                    name: vm.tabs[index].routerName
+                });
 
             }, 200, {leading: true, trailing: false}),
 

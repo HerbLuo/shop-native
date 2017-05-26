@@ -6,7 +6,7 @@
 -->
 <template>
     <div>
-        <text>Car</text>
+        <text>Car2</text>
     </div>
 </template>
 

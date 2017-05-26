@@ -68,7 +68,7 @@ export default {
 
         // appEntranceVersion 被意外置空了
         if (version === undefined) {
-            log.warning(`${logKey} version 不能为空`);
+            log.warning('%s version 不能为空', logKey);
             return;
         }
 
@@ -83,7 +83,7 @@ export default {
                 || version === '*' // 2. 参数version 指定了可以使用 任意版本 的缓存
             )
         ) {
-            log.info(`${logKey} render data from cache`);
+            log.info('%s render data from cache', logKey);
             renderCallback(data, 'cache');
             return;
         }
@@ -94,13 +94,13 @@ export default {
         try {
             data = data && data !== 'undefined' && JSON.parse(data);
         } catch (e) {
-            log.warning('can not parse data: ' + data);
+            log.warning('can not parse data: %s', data);
             data = null;
         }
 
         // 闪存中的entrances版本可用
         if (data && (data.version === version)) {
-            log.info(`${logKey} render data from storage`);
+            log.info('%s render data from storage', logKey);
             renderCallback(data, 'storage');
             return;
         }
@@ -131,7 +131,7 @@ export default {
          */
         serverPromiseFunc().then(({data}) => {
             clearTimeout(timer);
-            log.info(`${logKey} render data from server`);
+            log.info('%s render data from server', logKey);
             renderCallback(data, 'server')
         }).catch(e => {
             renderCallback(e, 'error');
@@ -139,13 +139,20 @@ export default {
 
         timer = setTimeout(() => {
             if (data) {
-                log.info(`${logKey} render data from timeout`);
+                log.info('%s render data from timeout', logKey);
                 renderCallback(data, 'timer')
             } else {
-                log.warning(`${logKey} 第一次渲染失败，等待服务器返回结果后的第二次渲染`)
+                log.warning('%s 第一次渲染失败，等待服务器返回结果后的第二次渲染', logKey)
             }
         }, delayTime);
 
     },
+    /**
+     * 只要内存缓存中存在数据，就使用它，而不必考虑其版本
+     * @constructor
+     */
+    B() {
+
+    }
 
 }

@@ -5,7 +5,7 @@
     2017/4/12 herbluo created
 -->
 <template>
-    <div>
+    <div class="top">
         <slider class="slider" interval="2000" auto-play="true">
             <div class="frame" v-if="imgList" v-for="img in imgList">
                 <image class="image" resize="cover" :src="img"></image>
@@ -16,17 +16,7 @@
 </template>
 
 <style scoped>
-    .slider {
-        width: 750px;
-        height: 234px;
-    }
-
-    .image {
-        width: 750px;
-        height: 234px;
-    }
-
-    .frame {
+    .top, .slider, .image, .frame {
         width: 750px;
         height: 234px;
     }

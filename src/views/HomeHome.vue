@@ -12,10 +12,14 @@
                 show-scrollbar="false"
                 loadmoreoffset="600" @loadmore="loadmore"
         >
-            <refresh class="refresh" @refresh="onRefresh" @pullingdown="onPullingDown" :display="refreshDisplay">
-                <!--<text>onrefresh...</text>-->
-                <refresh-indicator :canTouchMove="canTouchMove"></refresh-indicator>
-                <!--<loading-indicator></loading-indicator>-->
+            <refresh v-if="refreshShow"
+                     class="refresh"
+                     @refresh="onRefresh"
+                     @pullingdown="onPullingDown"
+                     :display="refreshDisplay"
+            >
+                <text class="refresh-indicator">{{canTouchMove ? '释放刷新' : '下拉刷新'}}</text>
+                <!--<refresh-indicator :canTouchMove="canTouchMove"></refresh-indicator>-->
             </refresh>
 
             <!-- 轮播图 -->
@@ -53,8 +57,14 @@
     }
 
     .refresh {
-        /*justify-content: center;*/
-        align-items: center;
+    }
+
+    .refresh-indicator {
+        padding-top: 20px;
+        padding-bottom: 20px;
+
+        font-size: 42px;
+        text-align: center;
     }
 </style>
 
@@ -96,6 +106,8 @@
                 },
                 canTouchMove: false,
 
+                refreshShow: false,
+
                 /* data */
                 loadBlock: [],
                 loadImg: [],
@@ -113,7 +125,8 @@
             loadingState.loading('home')
         },
         mounted() {
-            loadingState.ok('home')
+            loadingState.ok('home');
+            this.refreshShow = true;
         },
         methods: {
             /*
@@ -128,7 +141,7 @@
                         deviceHeight = env ? env.deviceHeight : config.deviceHeight,
                         deviceWidth = env ? env.deviceWidth : config.deviceWidth;
 
-                    height = (deviceHeight / deviceWidth * 750 - 100) + 'px'
+                    height = ((deviceHeight / deviceWidth * 750) || -1) + 'px';
                 } catch (e) {
                     log.error(e)
                 }

@@ -1,5 +1,6 @@
 <!--
-    
+    该组件上级是一个路由，
+    安卓平台下的fixed有问题，
     @author herbluo
     change logs:
     2017/5/25 herbluo created
@@ -16,11 +17,13 @@
         position: fixed;
         left: 0;
         bottom: 0;
+        height: 108px;
+        width: 750px;
     }
 </style>
 
 <script>
-    import TabBar from "../components/common/Tabbar.vue";
+    import TabBar from "../components/common/TabBar.vue";
 
     export default {
         components: {TabBar},

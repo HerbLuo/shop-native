@@ -23,6 +23,33 @@ declare namespace dewarn {
     interface response {
         body: body
     }
+    interface item {
+        id: number,
+        enabled: boolean,
+        modifyTime: number,
+        version: string,
+        name: string,
+        price: number,
+        description: string,
+        picLinksJson: string,
+        picLinksJson: Array,
+        itemSellingInfo: {
+            itemId: number,
+            quantity: number,
+            sales: number,
+            commentNum: number,
+            score: number,
+            inOrdering: number
+        },
+        detailDivId: number,
+        hop: {
+            id: number,
+            enabled: boolean,
+            name: string,
+            sellerId: number
+        }
+
+    }
 
     /**
      * weex 实例变量
@@ -64,3 +91,4 @@ declare const response: dewarn.response;
 declare const weex: dewarn.weex;
 declare const axios: dewarn.axios;
 declare const module: dewarn.module;
+declare const item: dewarn.item;

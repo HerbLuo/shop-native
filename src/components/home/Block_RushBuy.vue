@@ -258,6 +258,10 @@
                  * 转换成UI认可的格式（渲染数据）
                  */
                 function addSomeUiFeatures(rushBuys) {
+                    if (rushBuys.length !== 4) {
+                        console.info(rushBuys);
+                        return;
+                    }
                     rushBuys[0].startTimestamp = new Date().getTime() + 1000001;
                     rushBuys[0].cssClass = rushBuys[2].cssClass = ['image-left'];
                     rushBuys[1].cssClass = rushBuys[3].cssClass = ['image-right'];

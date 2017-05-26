@@ -9,7 +9,7 @@
     <div class="rel">
         <image
                 class="bg-image"
-                src="//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/5d334ce436c657c23542d675af73c1f951d010c1.png"
+                src="//closx-shop.oss-cn-qingdao.aliyuncs.com/app/v1/imgs/refresh-indicator.png"
         ></image>
         <div class="refresh-indicator">
             <text class="text">{{canTouchMove ? '松开刷新' : '下拉刷新'}}</text>
@@ -19,15 +19,17 @@
 
 <style scoped>
     .rel {
+        width: 750px;
+        height: 120px;
         position: relative;
     }
-    .bg-image {
-        width: 750px;
-        height: 1335px;
-        position: absolute;
-        left: 0;
-        bottom: 0;
-    }
+    /*.bg-image {*/
+        /*width: 750px;*/
+        /*height: 1335px;*/
+        /*position: absolute;*/
+        /*left: 0;*/
+        /*bottom: 0;*/
+    /*}*/
     .refresh-indicator {
         width: 750px;
         height: 120px;
@@ -36,7 +38,7 @@
     }
 
     .text {
-        color: white;
+        color: #ddd;
     }
 
 </style>
