@@ -8,132 +8,100 @@
  * change logs:
  * 2017/4/26 herbluo created
  */
-;
-
-//noinspection ES6ModulesDependencies
-const storage = weex.requireModule('storage');
-const modal = weex.requireModule('modal');
-
-import {weexEvent} from '../../eventbus'
-
 import dao from '../../dao'
+import {appVersionHandler} from '../../utils/app/app-version-handler'
+import {isWeb} from '../../utils/global'
 
-const app = {
-    updateTimestamp: new Date().getTime() - (1000 * 60 * 5),
-    appEntranceVersion: 'high-v1'
-};
+const modal = weex.requireModule('modal')
 
-const entranceBar = {
-    version: 'high-v1',
-    entitys: [
-        {
-            "id": 1,
-            "enabled": true,
-            "index": 0,
-            "name": "天猫",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/26296458982d1396e14698be8f059ccef9db0917.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 2,
-            "enabled": true,
-            "index": 1,
-            "name": "聚划算",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/d7b907b22952ac44f9e2d1029f8d364ac4560a52.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 3,
-            "enabled": true,
-            "index": 2,
-            "name": "天猫国际",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/18224c9afd17fcf3e15bb03ea95c244e469a452d.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 4,
-            "enabled": true,
-            "index": 3,
-            "name": "外卖",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/992bc9a571c9418bd7e6feb8f49c6e9ab4aa44da.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 5,
-            "enabled": true,
-            "index": 4,
-            "name": "天猫超市",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/d0cb8b15a7fbc2ed7e1dd58a3fc5b0ae4cf423a5.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 6,
-            "enabled": true,
-            "index": 5,
-            "name": "充值中心",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/2fcb04d9c79bcf97d1d7e4d9ac1c15627b3f8c13.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 7,
-            "enabled": true,
-            "index": 6,
-            "name": "飞猪旅行",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/d2bf542dc0a4c015e16d0f5426abff9d17973979.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 8,
-            "enabled": true,
-            "index": 7,
-            "name": "淘金币",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/e9f60973ac470de8c2aebb77fc634abad9e49cb8.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 9,
-            "enabled": true,
-            "index": 8,
-            "name": "到家",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/a9737f07a51d5fe46a198dcd167674c5d70564e7.png",
-            "link": "wxshop://black"
-        },
-        {
-            "id": 10,
-            "enabled": true,
-            "index": 9,
-            "name": "更多",
-            "img": "http://closx-shop.oss-cn-qingdao.aliyuncs.com/app/v0/55164ce1a4ca4db3ff00b729575162a56cd05c30.png",
-            "link": "wxshop://black"
-        }
-    ],
-};
+const app = require('./data/app.json')
+const provCityArea = require('./data/city.json')
+const entranceBar = require('./data/entrance.json')
 
+/* TODO DEBUG S */
+app.updateTimestamp = new Date().getTime() - (1000 * 60 * 5)
+/* TODO DEBUG E */
+appVersionHandler(app)
+
+/* *********
+ 写入数据
+ ********* */
+// 写入完毕的回调
+let callbackWhenFinished
+
+// 注册回调
+const registerWhenInitSnippetFinished = (callback) => {
+  callbackWhenFinished = callback
+}
+
+// 检查回调是否已注册
+const checkCallbackRegistered = () => {
+  if (typeof callbackWhenFinished !== 'function') {
+    const msg = '[INIT_SNIPPET] 未注册初始化完毕回调'
+    modal.toast({
+      message: msg,
+      duration: 2
+    })
+    console.error(msg)
+    return false
+  } else {
+    return true
+  }
+}
+
+// main
 (async function () {
-    console.info('init snippet started');
+  console.log('INIT_SNIPPET 初始化代码开始执行')
 
-    let events;
-    try {
-        events = await Promise.all([
-            dao.set__app(JSON.stringify(app)),
-            dao.set__entrance_bar(JSON.stringify(entranceBar)),
-        ]);
-    } catch (e) {
-        modal.toast({
-            message: '[INIT_SNIPPET] 严重错误，dao模块代码逻辑错误',
-            duration: 2
-        });
-        throw e;
-    }
-
-    for (let i = 0; i < events.length; i++) {
-        if (events[i].result !== 'success') {
-            console.warn('data wrote failed');
-            weexEvent.postMessage__app_init('fail');
-            return;
+  let events
+  try {
+    events = await Promise.all([
+      dao.set__app(JSON.stringify(app)),
+      dao.set__entrance_bar(JSON.stringify(entranceBar)),
+      dao.get__prov_city_area().then(({data}) => {
+        try {
+          // 该省份不存在，或者版本不一致
+          if (!data || data.substring(0, 20).indexOf(app['appCityVersion']) < 0) {
+            return dao.set__prov_city_area(JSON.stringify(provCityArea))
+          }
+        } catch (e) {
+          return dao.set__prov_city_area(JSON.stringify(provCityArea))
         }
+
+        return Promise.resolve({result: 'success'})
+      })
+    ])
+  } catch (e) {
+    modal.toast({
+      message: 'INIT_SNIPPET 严重错误，dao模块代码逻辑错误',
+      duration: 2
+    })
+    throw e
+  }
+
+  if (!checkCallbackRegistered()) {
+    return
+  }
+
+  // 写入失败
+  for (let i = 0; i < events.length; i++) {
+    if (events[i].result !== 'success') {
+      console.warn('数据写入失败 \n初始化代码执行失败')
+      callbackWhenFinished('fail')
+      return
     }
+  }
 
-    weexEvent.postMessage__app_init('success');
+  console.log('INIT_SNIPPET 初始化代码执行完毕')
+  callbackWhenFinished('success')
+})()
 
-})();
+// export
+
+;(typeof window === 'object') && isWeb && (
+  registerWhenInitSnippetFinished(window.whenInitSnippetFinished)
+)
+
+export {
+  registerWhenInitSnippetFinished
+}

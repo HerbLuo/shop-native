@@ -1,0 +1,12 @@
+{
+  "updateTimestamp": 0,
+  "appComponentVersion": [{
+    "id": 1,
+    "name": "entrance",
+    "version": "high-v1"
+  }, {
+    "id": 2,
+    "name": "city",
+    "version": "low-v1"
+  }]
+}

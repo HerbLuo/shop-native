@@ -8,44 +8,77 @@
  * change logs:
  * 2017/4/12 herbluo created
  */
-const Home = require('./views/Home.vue');
-const HomeHome = require('./views/HomeHome.vue');
-const HomeTalk = require('./views/HomeTalk.vue');
-const HomeQA = require('./views/HomeQA.vue');
-const HomeCar = require('./views/HomeCar.vue');
-const HomeUser = require('./views/HomeUser.vue');
+import VueRouter from 'vue-router'
 
-const Item = require('./views/Item.vue');
+const AppInitWeb = require('./views/AppInitWeb.vue')
 
-export default {
-    routes: [{
-        path: '/home/',
-        name: 'home',
-        component: Home,
-        children: [{
-            path: 'home',
-            name: 'homeHome',
-            component: HomeHome,
-        }, {
-            path: 'talk',
-            name: 'homeTalk',
-            component: HomeTalk,
-        }, {
-            path: 'qa/',
-            name: 'homeQa',
-            component: HomeQA,
-        }, {
-            path: 'car/',
-            name: 'homeCar',
-            component: HomeCar,
-        }, {
-            path: 'user/',
-            name: 'homeUser',
-            component: HomeUser,
-        }]
-    }, {
-        path: '/item/:id/version/:version/details/',
-        name: 'item',
-        component: Item,
-    }]
-}
+const HomeHome = require('./views/HomeHome.vue')
+const HomeTalk = require('./views/HomeTalk.vue')
+const HomeQA = require('./views/HomeQA.vue')
+const HomeCar = require('./views/HomeCar.vue')
+const HomeUser = require('./views/HomeUser.vue')
+
+const Item = require('./views/Item.vue')
+
+const UserLogin = require('./views/UserLogin.vue')
+
+const Order = require('./views/Order.vue')
+
+const AddressSelector = require('./views/AddressSelector.vue')
+const AddressManagement = require('./views/AddressManagement.vue')
+const AddressUpdater = require('./views/AddressUpdater.vue')
+
+const routes = [{
+  path: '/appinitweb/',
+  name: 'AppInitWeb',
+  component: AppInitWeb
+}, {
+  path: '/home/home/',
+  name: 'HomeHome',
+  component: HomeHome
+}, {
+  path: '/home/talk/',
+  name: 'HomeTalk',
+  component: HomeTalk
+}, {
+  path: '/home/qa/',
+  name: 'HomeQA',
+  component: HomeQA
+}, {
+  path: '/home/car/',
+  name: 'HomeCar',
+  component: HomeCar
+}, {
+  path: '/home/user/',
+  name: 'HomeUser',
+  component: HomeUser
+}, {
+  path: '/item/detail/',
+  name: 'Item',
+  component: Item
+}, {
+  path: '/user/login/',
+  name: 'UserLogin',
+  component: UserLogin
+}, {
+  path: '/order/',
+  name: 'Order',
+  component: Order
+}, {
+  path: '/address/selector/',
+  name: 'AddressSelector',
+  component: AddressSelector
+}, {
+  path: '/address/management/',
+  name: 'AddressManagement',
+  component: AddressManagement
+}, {
+  path: '/address/updater/',
+  name: 'AddressUpdater',
+  component: AddressUpdater
+}]
+
+Vue.use(VueRouter)
+const router = new VueRouter({routes})
+
+export default router

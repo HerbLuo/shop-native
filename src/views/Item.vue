@@ -5,12 +5,17 @@
     2017/5/25 herbluo created
 -->
 <template>
-    <div>
-        <item-slider-box @loaded="aComponentLoaded" :picLinks="item.picLinksJson"></item-slider-box>
-        <item-detail-box :item="item"></item-detail-box>
-        <split-bar></split-bar>
+  <scroller show-scrollbar="false">
+    <item-slider-box :picLinks="item && item.picLinksJson"></item-slider-box>
+    <item-detail-box :item="item"></item-detail-box>
+    <split-bar></split-bar>
+    <item-detail-bar :item="item"></item-detail-bar>
+    <split-bar></split-bar>
+    <div style="height: 400px; width: 750px; background-color:#eee;"></div>
 
-    </div>
+    <top-bar></top-bar>
+    <oprator-bar></oprator-bar>
+  </scroller>
 </template>
 
 <style scoped>
@@ -18,104 +23,85 @@
 </style>
 
 <script>
+  import '../utils/log'
+  import item, {
+    FETCH_ITEM, UPDATE_CURRENT_ITEM_MUTATION
+  } from '../store/modules/item'
+  import {createError, errorHandler} from '../utils/error'
+  import {registerModuleIfNotExist} from '../store'
+  import {readRouterQuery$Promise} from '../utils/app/app-page-helper'
 
-    import log from '../utils/log'
-    import dao from '../dao'
-    import api from '../api'
-    import cache from '../utils/cache'
-    import loader from '../utils/shop-native/loader'
+  import ItemSliderBox from '../components/item/ItemSliderBox.vue'
+  import ItemDetailBox from '../components/item/ItemDetailBox.vue'
+  import SplitBar from '../components/home/SplitBar.vue'
+  import ItemDetailBar from '../components/item/ItemDetailBar.vue'
+  import OpratorBar from '../components/item/OpratorBar.vue'
+  import TopBar from '../components/item/TopBar.vue'
 
-    import ItemSliderBox from "../components/item/ItemSliderBox.vue";
-    import ItemDetailBox from "../components/item/ItemDetailBox.vue";
-    import SplitBar from "../components/home/SplitBar.vue";
+  registerModuleIfNotExist('item', item)
 
-    const ITEM = 'item';
+  const logKey = 'VIEW/ITEM'
 
-    export default {
-        components: {
-            SplitBar,
-            ItemDetailBox,
-            ItemSliderBox
-        },
-        name: 'item',
-        data() {
-            return {
-                item: {},
-                loading: true,
-                componentsOnLoadingNum: 1
-            }
-        },
-        watch: {
-            componentsOnLoadingNum() {
-                if (this.componentsOnLoadingNum <= 0)
-                    this.loading = false;
-            }
-        },
-        created() {
-            this.render();
-            setTimeout(() => this.loading = false, 2000)
-        },
+  export default {
+    components: {
+      TopBar,
+      OpratorBar,
+      ItemDetailBar,
+      SplitBar,
+      ItemDetailBox,
+      ItemSliderBox
+    },
+    name: 'item',
+    data () {
+      return {
+        loading: true
+      }
+    },
+    computed: {
+      itemId () {
+        return this.$store.state.item.currentItemId
+      },
+      item () {
+        return this.loading
+          ? undefined : this.$store.state.item.items[this.itemId]
+      }
+    },
+    created () {
+      this.render()
+    },
+    methods: {
+      render () {
+        this.generateItemId$Promise().then((itemId) => {
+          this.$store.commit(UPDATE_CURRENT_ITEM_MUTATION, {itemId})
+          return this.$store.dispatch(FETCH_ITEM, {itemIds: [itemId]})
+            .then(() => {
+              this.loading = false
+            })
+        }).catch(error => {
+          errorHandler.checkNetworkAndWaitWhileNetworkIsReopen$Promise()
+            .then(() => { // network is open
+              console.error('[%s] 加载商品信息失败', logKey)
+              console.error(error)
+            })
+            .catch(this.render) // when net is reopen
+        })
+      },
 
-        methods: {
-            async render() {
-                // 路由参数
-                let params = this.$route.params;
-                if (!params) {
-                    log.error('[%s] 无法解析路由参数', ITEM);
-                    return;
-                }
+      generateItemId$Promise () {
+        // 路由参数
+        return readRouterQuery$Promise('Item').then((query) => {
+          // 商品id
+          const itemId = query.id | 0
+          if (!itemId || typeof itemId !== 'number') {
+            return Promise.reject(createError(`[${logKey}] 路由参数非法`, query))
+          }
 
-                // 商品id
-                let itemId = params.id | 0;
-                if (!itemId || typeof itemId !== 'number') {
-                    log.error('[%s] 路由参数非法', ITEM);
-                    return;
-                }
+          return itemId
+        })
+      }
 
-                this.item.version = params.version;
-
-                // 加载item data
-                let event = await this.loader(itemId);
-
-                // 加载失败
-                if (!event.data || event.data.length !== 1) {
-                    log.error('[%s] 加载商品信息失败', ITEM);
-                    return;
-                }
-
-                // 加载成功
-                let item = event.data[0];
-                // 处理数据
-                this.handler(item);
-                // 缓存数据
-//                cache.set(`${ITEM}_${itemId}`, item);
-                // 绑定到视图
-                this.item = item;
-
-            },
-            handler(item) {
-                item.picLinksJson = JSON.parse(item.picLinksJson);
-                if (!(item.picLinksJson instanceof Array)) {
-                    log.warning('[%s] item.picLinksJson可解析但非数组: %s', ITEM, item.picLinksJson)
-                }
-            },
-            loader(itemId) {
-                return new Promise(resolve => {
-                    loader.A({
-                        logKey: `[${ITEM}]`,
-                        version: this.item.version || 'no-cache',
-                        cacheName: `${ITEM}_${itemId}`,
-                        storagePromise: dao.get_by__item__by_id(itemId),
-                        serverPromiseFunc: () => Vue.axios.get(api.url.getItemById(itemId)),
-                        renderCallback: (data, type) => resolve({data, type})
-                    })
-                })
-            },
-            aComponentLoaded() {
-                this.componentsOnLoadingNum--;
-            }
-        }
     }
+  }
 </script>
 
 <style></style>

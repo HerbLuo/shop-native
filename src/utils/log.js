@@ -1,221 +1,124 @@
-/*!
- * Log.js
- * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
- * MIT Licensed
+/**
  *
- * changed by HerbLuo
+ * any question or idea, email to i@closx.com
+ * @author HerbLuo
+ * @date 2017/8/19
+ * @license Licensed under the MIT license.
+ *
+ * change logs:
+ * 2017/8/19 herbluo created
  */
-const fmt = require('util').format;
-//noinspection ES6ModulesDependencies
-const logModule = weex.requireModule('WXShpLifecycle');
-const modal = weex.requireModule('modal');
+import _reduce from 'lodash/reduce'
+import {logLevel} from '../config'
 
-const ConsoleWriteable = function () {
-};
-ConsoleWriteable.prototype.write = (str) => {
-    if (logModule && logModule.log) {
-        logModule.log(str || typeof str);
-    } else {
-        console.info(str);
+/**
+ * 日志等级，转化后的数据类似 {assert:0, error: 1}
+ *
+ * @type {{string: number}}
+ */
+const LEVEL_MAP = _reduce([
+  'assert',
+  'error',
+  'warn',
+  'info', // 所有未记录的级别，等同于info级别
+  'debug'
+], (result, value, key) => {
+  result[value] = key
+  return result
+}, {})
+
+const _level = LEVEL_MAP[logLevel]
+
+for (let m in console) {
+  if (console.hasOwnProperty(m) && typeof console[m] === 'function') {
+    // 日志等级过滤(未指定等级的按info计算)
+    if ((LEVEL_MAP[m] || LEVEL_MAP['info']) > _level) {
+      console[m] = () => {
+      }
     }
+  }
+}
 
-};
+/*
+ * 针对 warn 和 error特殊处理
+ */
+const fmt = require('util').format
+const modal = (() => weex.requireModule('modal'))()
 
+// noinspection JSUndefinedPropertyAssignment, JSUnresolvedVariable
+console.oldError = console.oldError || ::console.error
+// noinspection JSUndefinedPropertyAssignment, JSUnresolvedVariable
+console.oldWarn = console.oldWarn || ::console.warn
+
+const _showErrorDialog = (msg) => {
+  const duration = msg.length / 18
+  modal.toast({
+    message: msg,
+    duration: duration < 1 ? 1 : duration
+  })
+}
+
+const __levelMap = {
+  'ERROR': 'red',
+  'WARN': 'orange'
+}
 
 /**
- * Initialize a `Logger` with the given log `level` defaulting
- * to __DEBUG__ and `stream` defaulting to _stdout_.
+ * 格式化参数（添加颜色信息）
+ * 返回 console.log 可用的的参数数组
  *
- * @param level
- * @param writable
- * @api public
+ * @param levelStr {'ERROR'|'WARN'}
+ * @param args {Arguments}
+ * @param args[0] {string}
+ * @private
  */
-const Log  = function Log(level, writable) {
-    if ('string' === typeof level) level = Log[level.toUpperCase()];
-    this.level = level || Log.DEBUG;
-    this.writable = writable || new ConsoleWriteable();
-};
+const _formatArgs = (levelStr, args) => {
+  args[0] = `[${new Date().getTime()}] ${levelStr} ${args[0]}\n`
+  return [
+    '%c%s',
+    'color:' + __levelMap[levelStr],
+    fmt(...args)
+  ]
+}
 
 /**
- * System is unusable.
+ * console.error 参数一样，功能相似 不支持 %c
  *
- * @type Number
  */
-
-Log.EMERGENCY = 0;
+const printError = function () {
+  if (typeof arguments[0] === 'string') {
+    console.log(..._formatArgs('ERROR', arguments))
+  } else {
+    // noinspection JSUnresolvedFunction
+    console.oldError(...arguments)
+  }
+  _showErrorDialog(fmt(...arguments))
+}
 
 /**
- * Action must be taken immediately.
- *
- * @type Number
+ * console.warn
  */
+const printWarn = function () {
+  if (typeof arguments[0] === 'string') {
+    console.log(..._formatArgs('WARN', arguments))
+  } else {
+    // noinspection JSUnresolvedFunction
+    console.oldError(...arguments)
+  }
+}
 
-Log.ALERT = 1;
-
-/**
- * Critical condition.
- *
- * @type Number
+/*
+ * export
  */
+console.error = printError
+console.warn = printWarn
 
-Log.CRITICAL = 2;
+const Style = {
+  styleGray: 'color:gray',
+  styleBlue: 'color:blue',
+  styleGreen: 'color:green',
+  styleRed: 'color:red'
+}
 
-/**
- * Error condition.
- *
- * @type Number
- */
-
-Log.ERROR = 3;
-
-/**
- * Warning condition.
- *
- * @type Number
- */
-
-Log.WARNING = 4;
-
-/**
- * Normal but significant condition.
- *
- * @type Number
- */
-
-Log.NOTICE = 5;
-
-/**
- * Purely informational message.
- *
- * @type Number
- */
-
-Log.INFO = 6;
-
-/**
- * Application debug messages.
- *
- * @type Number
- */
-
-Log.DEBUG = 7;
-
-/**
- * prototype.
- */
-
-Log.prototype = {
-    /**
-     * Log output message.
-     *
-     * @param  {String} levelStr
-     * @param  {Array} args
-     * @api private
-     */
-
-    log: function (levelStr, args) {
-        if (Log[levelStr] <= this.level) {
-            const msg = fmt.apply(null, args);
-            this.writable.write(
-                '[' + new Date().getTime() + ']'
-                + ' ' + levelStr
-                + ' ' + msg
-                + '\n'
-            );
-        }
-    },
-
-    /**
-     * Log emergency `msg`.
-     *
-     * @param  {String} msg
-     * @api public
-     */
-
-    emergency: function (msg) {
-        this.log('EMERGENCY', arguments);
-    },
-
-    /**
-     * Log alert `msg`.
-     *
-     * @param  {String} msg
-     * @api public
-     */
-
-    alert: function (msg) {
-        this.log('ALERT', arguments);
-    },
-
-    /**
-     * Log critical `msg`.
-     *
-     * @param  {String} msg
-     * @api public
-     */
-
-    critical: function (msg) {
-        this.log('CRITICAL', arguments);
-    },
-
-    /**
-     * Log error `msg`.
-     *
-     * @param  {String} msg
-     * @api public
-     */
-
-    error: function (msg) {
-        const duration = msg.length / 18;
-        modal.toast({
-            message: msg,
-            duration: duration < 1 ? 1 : duration,
-        });
-        this.log('ERROR', arguments);
-    },
-
-    /**
-     * Log warning `msg`.
-     *
-     * @param  {String} msg
-     * @api public
-     */
-
-    warning: function (msg) {
-        this.log('WARNING', arguments);
-    },
-
-    /**
-     * Log notice `msg`.
-     *
-     * @param  {String} msg
-     * @api public
-     */
-
-    notice: function (msg) {
-        this.log('NOTICE', arguments);
-    },
-
-    /**
-     * Log info `msg`.
-     *
-     * @param  {String} msg
-     * @api public
-     */
-
-    info: function (msg) {
-        this.log('INFO', arguments);
-    },
-
-    /**
-     * Log debug `msg`.
-     *
-     * @param  msg
-     * @api public
-     */
-
-    debug: function (msg) {
-        this.log('DEBUG', arguments);
-    }
-};
-export default new Log('info');
+const logger = console
+export {logger, Style}

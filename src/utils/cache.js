@@ -8,18 +8,19 @@
  * change logs:
  * 2017/4/18 herbluo created
  */
-const LRU = require('lru-cache'),
-    options = {
-        max: 50,
-        maxAge: 1000 * 60 * 10 //10分钟
-    },
-    cache = LRU(options);
+const LRU = require('lru-cache')
+const options = {
+  max: 50,
+  maxAge: 1000 * 60 * 10 // 10分钟
+}
+const cache = LRU(options)
 
-export default cache;
+export default cache
 
 // only for de_warn
+// eslint-disable-next-line
 if (0) {
-    let cache_t = cache;
-    cache.get = cache_t.get;
-    cache.set = cache_t.set;
+  let cacheT = cache
+  cache.get = cacheT.get
+  cache.set = cacheT.set
 }

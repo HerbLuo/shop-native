@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Shop-WebApp</title>
+  <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=0.5, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-touch-fullscreen" content="yes">
+  <meta name="format-detection" content="telephone=no, email=no">
+  <style>body::before {
+    content: "1";
+    height: 1px;
+    overflow: hidden;
+    color: transparent;
+    display: block;
+  }</style>
+  <script src="./web/js/vue.runtime.js"></script>
+  <script src="./web/js/weex-vue-render/index.js"></script>
+</head>
+<body style="margin: 0">
+<div id="App">App 加载中...</div>
+<script>
+  setTimeout(function () {
+    var domapp = document.getElementById('App')
+    domapp && (domapp.innerHTML = '即将完成')
+  }, 1000)
+</script>
+</body>
+</html>

@@ -8,7 +8,24 @@
  * change logs:
  * 2017/5/25 herbluo created
  */
+/**
+ * @type {'iOS'|'Android'|'Web'}
+ */
+const platform = weex.config.platform || weex.config.env.platform
+const isWeb = platform === 'Web'
+const isDesktop = (() => {
+  try {
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios|iPad)/i)) {
+      return false
+    }
+  } catch (e) {
+    return false
+  }
+  return true
+})()
 
-export default {
-    platform: weex.config.env.platform
+export {
+  platform,
+  isWeb,
+  isDesktop
 }

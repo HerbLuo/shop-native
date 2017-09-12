@@ -3,14 +3,16 @@
     "es2015"
   ],
   "plugins": [
+    "transform-class-properties",
     "transform-object-rest-spread",
+    "transform-function-bind",
     "transform-async-to-generator",
     [
       "transform-runtime",
       {
         "helpers": false,
         "polyfill": false,
-        "regenerator": true,
+        "regenerator": true
       }
     ]
   ]

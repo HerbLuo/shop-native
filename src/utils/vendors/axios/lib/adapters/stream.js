@@ -19,18 +19,15 @@ const url = require('url');
 const createError = require('../core/createError');
 const enhanceError = require('../core/enhanceError');
 
-import log from '../../../../log'
-
 module.exports = function streamAdapter(config) {
     return new Promise(function dispatchStreamRequest(resolve, reject) {
 
-        let data = config.data;
-        let headers = config.headers;
-        let timer;
-        let aborted = false;
+        let {data, headers} = config
+        let timer
+        let aborted = false
 
         // HTTP basic authentication
-        let auth = undefined;
+        let auth
         if (config.auth) {
             let username = config.auth.username || '';
             let password = config.auth.password || '';
@@ -58,8 +55,6 @@ module.exports = function streamAdapter(config) {
             headers: headers,
             type: 'text'
         };
-
-        log.info(options.url);
 
         stream.fetch(options, res => {
             if (aborted) return;
