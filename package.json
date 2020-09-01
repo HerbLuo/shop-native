@@ -66,7 +66,7 @@
     "json-loader": "^0.5.7",
     "mocha": "^3.4.2",
     "mocha-loader": "^1.1.1",
-    "serve": "^1.4.0",
+    "serve": "^11.3.2",
     "ts-loader": "^2.3.1",
     "url-loader": "^0.5.8",
     "vue-loader": "^12.2.2",
