@@ -17,7 +17,7 @@
     "test-server": "webpack-dev-server --progress --config ./webpack.test.config.js --host 0.0.0.0 --port 8091"
   },
   "dependencies": {
-    "axios": "^0.15.3",
+    "axios": "^0.21.3",
     "babel-polyfill": "^6.6.1",
     "babel-runtime": "^6.6.1",
     "core-js": "^2.5.0",
