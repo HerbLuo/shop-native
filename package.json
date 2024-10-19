@@ -26,12 +26,12 @@
     "lru-cache": "^4.0.2",
     "proxy-polyfill": "^0.1.7",
     "qrcode": "^0.9.0",
-    "vue": "^2.3.3",
+    "vue": "^3.0.0",
     "vue-resource": "^1.2.1",
     "vue-router": "^2.1.1",
     "vuex": "^2.1.1",
     "vuex-router-sync": "^4.0.1",
-    "weex-vue-render": "^0.11.25"
+    "weex-vue-render": "^0.12.1"
   },
   "devDependencies": {
     "babel-core": "^6.20.0",
